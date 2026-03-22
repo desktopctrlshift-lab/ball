@@ -38,7 +38,7 @@ RUN apk add --no-cache gcc libc-dev git
 
 COPY --from=ghcr.io/astral-sh/uv:0.7.3 /uv /uvx /bin/
 COPY uv.lock pyproject.toml /code/
-RUN --mount=type=cache,target=/root/.cache/ \
+RUN --mount=type=cache,id=uv-cache-0,target=/root/.cache/ \
     uv venv $VIRTUAL_ENV && \
     uv sync --locked --no-install-project --no-editable --active
 COPY --parents admin_panel ballsdex LICENSE README.md /code/
