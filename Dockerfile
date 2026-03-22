@@ -42,13 +42,13 @@ RUN --mount=type=cache,target=/root/.cache/ \
     uv venv $VIRTUAL_ENV && \
     uv sync --locked --no-install-project --no-editable --active
 COPY --parents admin_panel ballsdex LICENSE README.md /code/
-RUN --mount=type=cache,target=/root/.cache/ \
+RUN --mount=type=cache,id=uv-cache,target=/root/.cache/ \
     uv sync --locked --no-editable --active --reinstall-package ballsdex && \
     cd admin_panel && django-admin collectstatic --no-input
 
 # this is running in a separate layer to allow bots with different extra packages to run on the same base layer
 COPY --parents bdextra.py config/extra.toml extra /code/
-RUN --mount=type=cache,target=/root/.cache/ \
+RUN --mount=type=cache,id=uv-cache-2,target=/root/.cache/ \
     if [ -f config/extra.toml ]; then uv pip install --reinstall $(python3 bdextra.py config/extra.toml); fi
 
 FROM nginx:1.29.3-alpine3.22 AS proxy
